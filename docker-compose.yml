@@ -1,0 +1,11 @@
+version: '3.7'
+services:
+  
+  php-apache:
+    image: php-apache
+
+  db:
+    image: mariadb
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:latest

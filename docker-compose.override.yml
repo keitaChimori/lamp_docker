@@ -1,0 +1,71 @@
+version: '3.7'
+services:
+  # ---------------------------------------
+  #   PHP + Apache のコンテナ
+  # ---------------------------------------
+  php-apache:
+    container_name: php-apache
+    build:
+      context: .
+      dockerfile: ./php/Dockerfile
+    working_dir: /var/www/html/test/public/
+    volumes:
+      - ./html:/var/www/html
+      - ./php/php.ini:/usr/local/etc/php/php.ini
+      - ./apache/000-default.conf:/etc/apache2/sites-enabled/000-default.conf
+      - ./apache/apache2.conf:/etc/apache2/apache2.conf
+    ports:
+      - 8080:80
+    networks:
+      - app
+
+  # ---------------------------------------
+  #   MariaDB のコンテナ
+  # ---------------------------------------
+  db:
+    image: mariadb
+    container_name: db
+    environment:
+      # rootアカウントに設定するためのパスワードを指定(必須)
+      MYSQL_ROOT_PASSWORD: root
+      # 起動時に作られるデータベース名(プロジェクトにより適宜変更)
+      MYSQL_DATABASE: dbname
+      # タイムゾーン設定
+      TZ: Asia/Tokyo
+    # 起動時のコマンド
+    command: mysqld --character-set-server=utf8 --collation-server=utf8_unicode_ci
+    volumes:
+      # ディレクトリを同期
+      - ./docker/db/data:/var/lib/mysql
+      # ローカルのmy.cnfをマウント
+      - ./mysql/my.cnf:/etc/mysql/conf.d/my.cnf 
+    networks:
+      - app
+
+  # ---------------------------------------
+  #   phpmyadmin のコンテナ
+  # ---------------------------------------
+  phpmyadmin:
+    container_name: phpmyadmin
+    environment:
+      # DB環境変数
+      - PMA_ARBITRARY=1
+      - PMA_HOST=db
+      - PMA_USER=root
+      - PMA_PASSWORD=root
+    depends_on:
+      # dbコンテナの次に起動
+      - db
+    volumes:
+      - phpmyadmin:/sessions
+    ports:
+      - 8000:80
+    networks:
+      - app
+
+volumes:
+  phpmyadmin:
+
+networks:
+  app:
+    driver: bridge
