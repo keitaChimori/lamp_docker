@@ -1,6 +1,9 @@
-# How to build lamp by just using docker-compose.
+# LAMP by just using docker-compose.
+You can build LAMP by just using docker-compose.
 
-apache
-php:7.4.26
-mariadb
-phpMyAdmin
+## Structure
+| Container name | Image | Function |
+| --- | ----------- | ------- |
+| php-apache | php-apache |	php,apache |
+| db | mariadb | database |
+| phpmyadmin | phpmyadmin | phpmyadmin |
